@@ -17,9 +17,12 @@ interface WeatherData {
 }
 
 interface Location {
+  id: number;
   name: string;
   latitude: number;
   longitude: number;
+  country: string;
+  admin1: string;
 }
 
 const WeatherApp: React.FC = () => {
@@ -45,45 +48,37 @@ const WeatherApp: React.FC = () => {
   }, []);
 
   const fetchSuggestions = async (input: string) => {
-    if (input.length < 3) return;
-
+    if (input.length < 2) return;
+  
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&addressdetails=1&limit=10`);
+      const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(input)}&count=5`);
       const data = await response.json();
-
-      const uniqueLocations = new Map<string, Location>();
-
-      data.forEach((item: any) => {
-        const simplifiedName = simplifyLocationName(item);
-        if (!uniqueLocations.has(simplifiedName) && !hasZipCode(simplifiedName)) {
-          uniqueLocations.set(simplifiedName, {
-            name: simplifiedName,
-            latitude: parseFloat(item.lat),
-            longitude: parseFloat(item.lon)
-          });
-        }
-      });
-
-      setSuggestions(Array.from(uniqueLocations.values()).slice(0, 5));
+  
+      if (data.results) {
+        const suggestions: Location[] = data.results.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          latitude: item.latitude,
+          longitude: item.longitude,
+          country: item.country,
+          admin1: item.admin1,
+        }));
+        setSuggestions(suggestions);
+      } else {
+        setSuggestions([]);
+      }
     } catch (err) {
       console.error('Failed to fetch suggestions:', err);
+      setSuggestions([]);
     }
   };
 
-  const simplifyLocationName = (item: any): string => {
-    const parts = [];
-    if (item.address.city) parts.push(item.address.city);
-    if (item.address.state) parts.push(item.address.state);
-    if (item.address.country) parts.push(item.address.country);
-    return parts.join(', ');
-  };
-
-  const hasZipCode = (name: string): boolean => {
-    return /\d{5}/.test(name);
+  const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    event.target.select();
   };
 
   const handleLocationSelect = (location: Location) => {
-    setLocation(location.name);
+    setLocation(`${location.name}, ${location.admin1}, ${location.country}`);
     setSelectedLocation(location);
     setSuggestions([]);
   };
@@ -196,16 +191,17 @@ const WeatherApp: React.FC = () => {
             setLocation(e.target.value);
             fetchSuggestions(e.target.value);
           }}
+          onFocus={handleInputFocus}
           className="location-input"
         />
         <div ref={autocompleteRef} className="autocomplete">
-          {suggestions.map((suggestion, index) => (
+          {suggestions.map((suggestion) => (
             <div 
-              key={index} 
+              key={suggestion.id} 
               className="suggestion"
               onClick={() => handleLocationSelect(suggestion)}
             >
-              {suggestion.name}
+              {suggestion.name}, {suggestion.admin1}, {suggestion.country}
             </div>
           ))}
         </div>
