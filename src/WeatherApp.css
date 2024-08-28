@@ -126,3 +126,35 @@
     color: red;
     text-align: center;
   }
+
+  .forecast {
+    margin-top: 1rem;
+    width: 100%;
+  }
+  
+  .forecast h3 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+  
+  .forecast-day {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ecf0f1;
+  }
+  
+  .forecast-day:last-child {
+    border-bottom: none;
+  }
+  
+  .day-name {
+    font-weight: bold;
+    color: #34495e;
+  }
+  
+  .temperature-range {
+    color: #7f8c8d;
+  }

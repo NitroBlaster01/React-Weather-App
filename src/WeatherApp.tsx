@@ -7,6 +7,13 @@ interface WeatherData {
     temperature2m: number;
     weatherCode: number;
   };
+
+  daily: {
+    time: Date[];
+    weatherCode: number[];
+    temperature2mMax: number[];
+    temperature2mMin: number[];
+  };
 }
 
 interface Location {
@@ -90,20 +97,35 @@ const WeatherApp: React.FC = () => {
       const params = {
         latitude: selectedLocation.latitude,
         longitude: selectedLocation.longitude,
+        daily: ["weather_code", "temperature_2m_max", "temperature_2m_min"],
         current: ["temperature_2m", "weather_code"],
-        temperature_unit: "fahrenheit"
+        temperature_unit: "fahrenheit",
+        forecast_days: 7,
       };
       const url = "https://api.open-meteo.com/v1/forecast";
       const responses = await fetchWeatherApi(url, params);
 
       // Process first location
       const response = responses[0];
+      const utcOffsetSeconds = response.utcOffsetSeconds();
       const current = response.current()!;
+      const daily = response.daily()!;
+
+      const range = (start: number, stop: number, step: number) =>
+      Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
 
       const weatherData: WeatherData = {
         current: {
           temperature2m: current.variables(0)!.value(),
           weatherCode: current.variables(1)!.value(),
+        },
+        daily: {
+          time: range(Number(daily.time()), Number(daily.timeEnd()), daily.interval()).map(
+            (t) => new Date((t + utcOffsetSeconds) * 1000)
+          ),
+          weatherCode: daily.variables(0)!.valuesArray()!,
+          temperature2mMax: daily.variables(1)!.valuesArray()!,
+          temperature2mMin: daily.variables(2)!.valuesArray()!,
         },
       };
 
@@ -122,6 +144,11 @@ const WeatherApp: React.FC = () => {
 
   const getWeatherIcon = (weatherCode: number): string => {
     return `/src/assets/weather-icons/${weatherCode}.png`;
+  };
+
+  const formatDay = (date: Date, index: number) => {
+    if (index === 0) return 'Today';
+    return date.toLocaleDateString('en-US', { weekday: 'short' });
   };
 
   const getWeatherDescription = (weatherCode: number): string => {
@@ -153,7 +180,7 @@ const WeatherApp: React.FC = () => {
     if (weatherCode === 95) return "Thunderstorm";
     if (weatherCode === 96) return "Thunderstorm & Slight Hail";
     if (weatherCode === 99) return "Thunderstorm & Heavy Hail";
-    if (weatherCode === 96 || weatherCode === 99) return "Thunderstorm with slight and heavy hail";
+
     return "Unknown weather condition";
   };
 
@@ -188,14 +215,25 @@ const WeatherApp: React.FC = () => {
         <div className="weather-info">
           <h2>{selectedLocation?.name}</h2>
           <div className="weather-details">
-            <img 
-              src={getWeatherIcon(weather.current.weatherCode)} 
-              alt={`Weather icon for ${getWeatherDescription(weather.current.weatherCode)}`}
-              className="weather-icon"
-            />
-            <p className="weather-description">{getWeatherDescription(weather.current.weatherCode)}</p>
-          </div>
-          <p className="temperature">Temperature: {weather.current.temperature2m.toFixed(1)}°F</p>
+          <img 
+            src={getWeatherIcon(weather.current.weatherCode)} 
+            alt={`Weather icon for ${getWeatherDescription(weather.current.weatherCode)}`}
+            className="weather-icon"
+          />
+          <p className="weather-description">{getWeatherDescription(weather.current.weatherCode)}</p>
+          <p className="current-temperature">{weather.current.temperature2m.toFixed(1)}°F</p>
+        </div>
+        <div className="forecast">
+          <h3>7-Day Forecast</h3>
+          {weather.daily.time.map((day, index) => (
+            <div key={day.toISOString()} className="forecast-day">
+              <span className="day-name">{formatDay(day, index)}</span>
+              <span className="temperature-range">
+                {weather.daily.temperature2mMin[index].toFixed(1)}°F - {weather.daily.temperature2mMax[index].toFixed(1)}°F
+              </span>
+            </div>
+          ))}
+        </div>
         </div>
       )}
     </div>
