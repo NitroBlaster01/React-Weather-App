@@ -1,0 +1,128 @@
+.weather-app {
+  padding: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  background-color: #f0f4f8;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.weather-title {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.input-container {
+  margin-bottom: 1rem;
+  position: relative;
+  width: 80%;
+  max-width: 300px;
+  box-sizing: border-box;
+}
+
+.location-input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  background-color: white;
+  color: #2c3e50;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.autocomplete {
+  position: absolute;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #bdc3c7;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.suggestion {
+  padding: 0.75rem;
+  cursor: pointer;
+  color: #34495e;
+  text-align: center;
+}
+
+.suggestion:hover {
+  background-color: #ecf0f1;
+}
+
+.error-message {
+  color: #e74c3c;
+  text-align: center;
+  background-color: #fadbd8;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  width: 80%;
+  max-width: 300px;
+}
+
+.weather-info {
+  background-color: white;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-top: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 300px;
+}
+
+.weather-info h2 {
+  margin-top: 0;
+  color: #2c3e50;
+  border-bottom: 1px solid #ecf0f1;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.weather-info p {
+  margin: 0.5rem 0;
+  color: #34495e;
+  text-align: center;
+}
+
+.weather-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.weather-icon {
+  width: 128px;
+  height: 128px;
+}
+
+.weather-description {
+  margin-top: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.temperature {
+  font-size: 18px;
+  text-align: center;
+}
+
+.error-message {
+    color: red;
+    text-align: center;
+  }
