@@ -11,6 +11,6 @@ You will need to have npm and Node.js installed on your system.
 - Run `npm install`. This will install the appropriate libraries for the project.
 - Run `npm run dev`. This will start the project.
 - The command line should return a link to where the project is now being hosted locally. Something like this:
-  <img src="src/assets/react.png" alt="img" align="right" width="560px" height="400px">
+  <img src="./src/assets/react.svg" alt="img" align="right" width="560px" height="400px">
 - Navigate to the link using the browser of your choice. The app should be running.
 
