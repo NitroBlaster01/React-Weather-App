@@ -1,6 +1,8 @@
-# React + TypeScript + Vite
+# Weather Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An application that shows the current weather of any city using the [Open-Meteo](https://open-meteo.com/en/docs)free forecast API.a
+Also uses [Big Data Cloud](https://www.bigdatacloud.com/) for reverse searching and geolocating.
+Built using React+Vite on [stackblitz](https://stackblitz.com/)
 
 Currently, two official plugins are available:
 
