@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fetchWeatherApi } from 'openmeteo';
 import './WeatherApp.css';
-import { MapPin } from 'lucide-react';
+import { MapPin, Info, X } from 'lucide-react';
 
-interface WeatherData {
+//interface for weather variables (current and daily)
+interface WeatherData {      
   current: {
     temperature2m: number;
     weatherCode: number;
@@ -16,7 +17,7 @@ interface WeatherData {
     temperature2mMin: number[];
   };
 }
-
+//location data interface
 interface Location {
   id: number;
   name: string;
@@ -35,6 +36,7 @@ const WeatherApp: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const autocompleteRef = useRef<HTMLDivElement>(null);
+  const [showInfoPopup, setShowInfoPopup] = useState<boolean>(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -48,7 +50,7 @@ const WeatherApp: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
+  //return suggestions based off geocoding results from typed name
   const fetchSuggestions = async (input: string) => {
     if (input.length < 2) return;
 
@@ -78,14 +80,14 @@ const WeatherApp: React.FC = () => {
   const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
     event.target.select();
   };
-
+  //set location for weather to be read
   const handleLocationSelect = (location: Location) => {
     setInputValue(`${location.name}, ${location.admin1}, ${location.country}`);
     setSelectedLocation(location);
     setSuggestions([]);
     fetchWeather(location.latitude, location.longitude, `${location.name}, ${location.admin1}, ${location.country}`);
   };
-
+  //fetch and set weather data for location
   const fetchWeather = async (lat: number, lon: number, locationName: string = ''): Promise<void> => {
     setLoading(true);
     setError(null);
@@ -96,7 +98,7 @@ const WeatherApp: React.FC = () => {
         daily: ["weather_code", "temperature_2m_max", "temperature_2m_min"],
         current: ["temperature_2m", "weather_code"],
         temperature_unit: "fahrenheit",
-        forecast_days: 7,
+        forecast_days: 6,
       };
       const url = "https://api.open-meteo.com/v1/forecast";
       const responses = await fetchWeatherApi(url, params);
@@ -140,16 +142,16 @@ const WeatherApp: React.FC = () => {
       fetchWeather(selectedLocation.latitude, selectedLocation.longitude);
     }
   }, [selectedLocation]);
-
+  //set weather icon for weather code
   const getWeatherIcon = (weatherCode: number): string => {
     return `/src/assets/weather-icons/${weatherCode}.png`;
   };
-
+  //formating of forecast dates to be more user-friendly
   const formatDay = (date: Date, index: number) => {
     if (index === 0) return 'Today';
     return date.toLocaleDateString('en-US', { weekday: 'short' });
   };
-
+  //weather descriptions based off weather codes
   const getWeatherDescription = (weatherCode: number): string => {
     if (weatherCode === 0) return "Clear Skies";
     if (weatherCode === 1) return "Mainly Clear";
@@ -182,6 +184,7 @@ const WeatherApp: React.FC = () => {
 
     return "Unknown weather condition";
   };
+  //geolocation; uses user location reverse search a location; sets location
   const handleGetCurrentLocation = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -208,10 +211,42 @@ const WeatherApp: React.FC = () => {
       setError("Geolocation is not supported by your browser.");
     }
   };
+  //information popup
+  const toggleInfoPopup = () => {
+    setShowInfoPopup(!showInfoPopup);
+  };
 
   return (
     <div className="weather-app">
-      <h1 className="weather-title">Weather Forecast</h1>
+      <div className="app-header">
+        <h1 className="weather-title">Weather Forecast</h1>
+        <button onClick={toggleInfoPopup} className="info-button">
+          <Info size={24} />
+        </button>
+      </div>
+      
+      {/* Info Popup */}
+      {showInfoPopup && (
+        <div className="info-popup">
+          <div className="info-popup-content">
+            <button onClick={toggleInfoPopup} className="close-button">
+              <X size={24} />
+            </button>
+            <h2>Information</h2>
+            <p>Made by Khandaker Fahmid</p>
+            <p>Made for a techincal assesment for PM Accelerator</p>
+            <p>The Product Manager Accelerator Program is designed to support 
+              PM professionals through every stage of their career. From students 
+              looking for entry-level jobs to Directors looking to take on a leadership 
+              role, our program has helped over hundreds of students fulfill their 
+              career aspirations.Our Product Manager Accelerator community are ambitious 
+              and committed. Through our program they have learnt, honed and developed 
+              new PM and leadership skills, giving them a strong foundation for their 
+              future endeavours.</p>
+            <p><a href="http://www.drnancyli.com" target="_blank" rel="noopener noreferrer">Website</a></p>
+          </div>
+        </div>
+      )}
       <div className="input-container">
         <input
           type="text"
@@ -253,7 +288,7 @@ const WeatherApp: React.FC = () => {
           <p className="current-temperature">{weather.current.temperature2m.toFixed(1)}°F</p>
         </div>
         <div className="forecast">
-          <h3>7-Day Forecast</h3>
+          <h3>5-Day Forecast</h3>
           {weather.daily.time.map((day, index) => (
             <div key={day.toISOString()} className="forecast-day">
               <span className="day-name">{formatDay(day, index)}</span>
