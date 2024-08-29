@@ -28,7 +28,8 @@ interface Location {
 
 const WeatherApp: React.FC = () => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [location, setLocation] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>('');
+  const [displayLocation, setDisplayLocation] = useState<string>('');
   const [suggestions, setSuggestions] = useState<Location[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,9 +80,10 @@ const WeatherApp: React.FC = () => {
   };
 
   const handleLocationSelect = (location: Location) => {
-    setLocation(`${location.name}, ${location.admin1}, ${location.country}`);
+    setInputValue(`${location.name}, ${location.admin1}, ${location.country}`);
     setSelectedLocation(location);
     setSuggestions([]);
+    fetchWeather(location.latitude, location.longitude, `${location.name}, ${location.admin1}, ${location.country}`);
   };
 
   const fetchWeather = async (lat: number, lon: number, locationName: string = ''): Promise<void> => {
@@ -125,7 +127,7 @@ const WeatherApp: React.FC = () => {
 
       setWeather(weatherData);
       if (locationName) {
-        setLocation(locationName);
+        setDisplayLocation(locationName);
       }
     } catch (err) {
       setError('Failed to fetch weather data');
@@ -180,7 +182,6 @@ const WeatherApp: React.FC = () => {
 
     return "Unknown weather condition";
   };
-
   const handleGetCurrentLocation = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -191,9 +192,11 @@ const WeatherApp: React.FC = () => {
             const data = await response.json();
             const locationName = `${data.city || data.locality || 'Current location'}, ${data.principalSubdivision}, ${data.countryName}`;
             fetchWeather(latitude, longitude, locationName);
+            setInputValue(locationName);
           } catch (error) {
             console.error("Error fetching location name:", error);
             fetchWeather(latitude, longitude, "Current location");
+            setInputValue("Current location");
           }
         },
         (error) => {
@@ -213,9 +216,9 @@ const WeatherApp: React.FC = () => {
         <input
           type="text"
           placeholder="Enter location"
-          value={location}
+          value={inputValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setLocation(e.target.value);
+            setInputValue(e.target.value);
             fetchSuggestions(e.target.value);
           }}
           onFocus={handleInputFocus}
@@ -239,7 +242,7 @@ const WeatherApp: React.FC = () => {
       {error && <p className="error-message">{error}</p>}
       {weather && (
         <div className="weather-info">
-          <h2>{location}</h2>
+          <h2>{displayLocation}</h2>
           <div className="weather-details">
           <img 
             src={getWeatherIcon(weather.current.weatherCode)} 
