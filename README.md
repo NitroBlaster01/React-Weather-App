@@ -14,3 +14,7 @@ You will need to have npm and Node.js installed on your system.
   <img src="./src/assets/cmdimg.png" alt="img">
 - Navigate to the local link using the browser of your choice. The app should be running.
 
+## Credits
+Uses the [Open-Meteo](https://open-meteo.com/en/docs) free forecast API
+Uses the [Big Data Cloud](https://www.bigdatacloud.com/) geolocation API.
+Weather status icons from these [creators](/credits.html).
