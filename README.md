@@ -2,51 +2,17 @@
 
 An application that shows the current weather of any city using the [Open-Meteo](https://open-meteo.com/en/docs)free forecast API.a
 Also uses [Big Data Cloud](https://www.bigdatacloud.com/) for reverse searching and geolocating.
-Built using React+Vite on [stackblitz](https://stackblitz.com/)
+Built using React+Vite on [stackblitz](https://stackblitz.com/).
 
-Currently, two official plugins are available:
+## Running the application
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+You will need to have npm and Node.js installed on your system.  
 
-## Expanding the ESLint configuration
+- First either clone the repository or download it as a zip and navigate to the root folder of the application.
+- Open the folder in the command line of your choice.
+- Run `npm install`. This will install the appropriate libraries for the project.
+- Run `npm run dev`. This will start the project.
+- The command line should return a link to where the project is now being hosted locally. Something like this:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Use the program.
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
