@@ -23,23 +23,45 @@
   width: 80%;
   max-width: 300px;
   box-sizing: border-box;
+  display: flex;
+  align-items: stretch; /* Changed from center to stretch */
 }
 
 .location-input {
-  width: 100%;
+  flex-grow: 1;
   padding: 0.75rem;
   font-size: 1rem;
   border: 1px solid #bdc3c7;
-  border-radius: 4px;
+  border-right: none; /* Remove right border */
+  border-radius: 4px 0 0 4px;
   background-color: white;
   color: #2c3e50;
   box-sizing: border-box;
-  text-align: center;
+}
+
+.location-button {
+  background-color: #3498db;
+  border: 1px solid #3498db; /* Add border */
+  color: white;
+  padding: 0;
+  width: 40px; /* Set a fixed width */
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.location-button:hover {
+  background-color: #2980b9;
 }
 
 .autocomplete {
   position: absolute;
-  width: 100%;
+  top: 100%;
+  left: 0;
+  right: 0;
   background-color: white;
   border: 1px solid #bdc3c7;
   border-top: none;
@@ -55,7 +77,6 @@
   padding: 0.75rem;
   cursor: pointer;
   color: #34495e;
-  text-align: center;
 }
 
 .suggestion:hover {
@@ -122,39 +143,34 @@
   text-align: center;
 }
 
-.error-message {
-    color: red;
-    text-align: center;
-  }
+.forecast {
+  margin-top: 1rem;
+  width: 100%;
+}
 
-  .forecast {
-    margin-top: 1rem;
-    width: 100%;
-  }
-  
-  .forecast h3 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-  }
-  
-  .forecast-day {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #ecf0f1;
-  }
-  
-  .forecast-day:last-child {
-    border-bottom: none;
-  }
-  
-  .day-name {
-    font-weight: bold;
-    color: #34495e;
-  }
-  
-  .temperature-range {
-    color: #7f8c8d;
-  }
+.forecast h3 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.forecast-day {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.forecast-day:last-child {
+  border-bottom: none;
+}
+
+.day-name {
+  font-weight: bold;
+  color: #34495e;
+}
+
+.temperature-range {
+  color: #7f8c8d;
+}

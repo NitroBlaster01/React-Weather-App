@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fetchWeatherApi } from 'openmeteo';
 import './WeatherApp.css';
+import { MapPin } from 'lucide-react';
 
 interface WeatherData {
   current: {
@@ -49,11 +50,11 @@ const WeatherApp: React.FC = () => {
 
   const fetchSuggestions = async (input: string) => {
     if (input.length < 2) return;
-  
+
     try {
       const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(input)}&count=5`);
       const data = await response.json();
-  
+
       if (data.results) {
         const suggestions: Location[] = data.results.map((item: any) => ({
           id: item.id,
@@ -83,15 +84,13 @@ const WeatherApp: React.FC = () => {
     setSuggestions([]);
   };
 
-  const fetchWeather = async (): Promise<void> => {
-    if (!selectedLocation) return;
-
+  const fetchWeather = async (lat: number, lon: number, locationName: string = ''): Promise<void> => {
     setLoading(true);
     setError(null);
     try {
       const params = {
-        latitude: selectedLocation.latitude,
-        longitude: selectedLocation.longitude,
+        latitude: lat,
+        longitude: lon,
         daily: ["weather_code", "temperature_2m_max", "temperature_2m_min"],
         current: ["temperature_2m", "weather_code"],
         temperature_unit: "fahrenheit",
@@ -125,6 +124,9 @@ const WeatherApp: React.FC = () => {
       };
 
       setWeather(weatherData);
+      if (locationName) {
+        setLocation(locationName);
+      }
     } catch (err) {
       setError('Failed to fetch weather data');
     }
@@ -133,7 +135,7 @@ const WeatherApp: React.FC = () => {
 
   useEffect(() => {
     if (selectedLocation) {
-      fetchWeather();
+      fetchWeather(selectedLocation.latitude, selectedLocation.longitude);
     }
   }, [selectedLocation]);
 
@@ -179,6 +181,31 @@ const WeatherApp: React.FC = () => {
     return "Unknown weather condition";
   };
 
+  const handleGetCurrentLocation = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
+            const data = await response.json();
+            const locationName = `${data.city || data.locality || 'Current location'}, ${data.principalSubdivision}, ${data.countryName}`;
+            fetchWeather(latitude, longitude, locationName);
+          } catch (error) {
+            console.error("Error fetching location name:", error);
+            fetchWeather(latitude, longitude, "Current location");
+          }
+        },
+        (error) => {
+          setError("Unable to retrieve your location. Please check your browser settings.");
+          console.error("Geolocation error:", error);
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by your browser.");
+    }
+  };
+
   return (
     <div className="weather-app">
       <h1 className="weather-title">Weather Forecast</h1>
@@ -194,6 +221,9 @@ const WeatherApp: React.FC = () => {
           onFocus={handleInputFocus}
           className="location-input"
         />
+        <button onClick={handleGetCurrentLocation} className="location-button">
+          <MapPin size={24} />
+        </button>
         <div ref={autocompleteRef} className="autocomplete">
           {suggestions.map((suggestion) => (
             <div 
@@ -209,7 +239,7 @@ const WeatherApp: React.FC = () => {
       {error && <p className="error-message">{error}</p>}
       {weather && (
         <div className="weather-info">
-          <h2>{selectedLocation?.name}</h2>
+          <h2>{location}</h2>
           <div className="weather-details">
           <img 
             src={getWeatherIcon(weather.current.weatherCode)} 
